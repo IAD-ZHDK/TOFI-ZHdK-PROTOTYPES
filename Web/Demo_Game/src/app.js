@@ -19,8 +19,8 @@ const sketch = (p) => {
     sensorValues[0] = 65534
     sensorValues[1] = 65534
     sensorValues[2] = 65534
-    p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL)
-    p.background('#FFF')
+    p.createCanvas(p.windowWidth, p.windowHeight)
+    p.background(0)
     myBLE = new P5ble()
     p.textFont(myFont)
     p.textSize(p.width / 60)
@@ -29,17 +29,17 @@ const sketch = (p) => {
 
   p.draw = function () {
     p.background(0)
-    p.normalMaterial()
+    // p.normalMaterial()
 
     let spacing = p.windowWidth / sensorValues.length
 
     for (let i = 0; i < sensorValues.length; i++) {
       p.push()
-      p.translate(-(spacing), 0, 0)
-      p.translate(spacing * i, 0, 0)
-      let radius = p.map(sensorValues[i], 0, 65534, 10, spacing / 3)
-      p.sphere(radius, 20, 20)
+      p.translate((p.windowWidth / 2) - spacing, p.windowHeight / 2)
+      p.translate(spacing * i, 0)
       p.fill(255)
+      let radius = p.map(sensorValues[i], 0, 65534, 10, spacing / 3)
+      p.ellipse(0, 0, radius, radius)
       p.text(sensorValues[i], 0, spacing / 3 * 1.20)
       p.pop()
     }
@@ -77,6 +77,8 @@ function gotCharacteristics (error, characteristics) {
       myBLE.startNotifications(sensorCharacteristic, handleSensor, 'custom')
       console.log('characteristics: 1')
     } else if (i === 1) {
+      sensorCharacteristic = characteristics[i]
+      // myBLE.startNotifications(sensorCharacteristic, handlebyte, 'custom')
       console.log('characteristics: 2')
     } else if (i === 2) {
       console.log('characteristics: 3')
@@ -87,14 +89,36 @@ function gotCharacteristics (error, characteristics) {
 }
 
 // A function that will be called once got characteristics
+/*
 function handlebyte (data) {
-  // let a = data.getByte(0, true)
-  // let b = data.getByte(1, true)
-  // let c = data.getByte(2, true)
-  // console.log(data)
+  let byteArray = [0, 0, 0, 0]
+  let btnData = (data.getUint8(0, true)).toString(2)
+  for (let i = 0; i < byteArray.length; i++) {
+    byteArray[i] = btnData & 1
+    console.log(i + '_' + byteArray[i])
+    btnData = btnData >> 1
+  }
+  console.log('0')
+  if (byteArray[0] === 1) {
+    // console.log(byteArray[0])
+    color = '#FFF3D9'
+  }
+  if (byteArray[1] === 1) {
+    // console.log(byteArray[1])
+    color = '#FFE6B3'
+  }
+  if (byteArray[2] === 1) {
+    // console.log(byteArray[2])
+    color = '#47AAD9'
+  }
+  if (byteArray[3] === 1) {
+    // console.log(byteArray[3])
+    color = '#2E6E8D'
+  }
 }
-
+*/
 function handleSensor (data) {
+  // weighted moving average of values
   sensorValues[0] = Math.floor(sensorValues[0] * 0.8)
   sensorValues[1] = Math.floor(sensorValues[1] * 0.8)
   sensorValues[2] = Math.floor(sensorValues[2] * 0.8)
