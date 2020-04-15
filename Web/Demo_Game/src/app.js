@@ -6,6 +6,7 @@ const serviceUuid = 'ff9c1e42-7b32-11ea-bc55-0242ac130003'
 let sensorCharacteristic
 let sensorValues = []
 let myBLE
+let isConnected = false
 
 const sketch = (p) => {
   let x = 100
@@ -25,23 +26,31 @@ const sketch = (p) => {
     p.textFont(myFont)
     p.textSize(p.width / 60)
     p.textAlign(p.CENTER, p.CENTER)
+    let isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime)
+    if (!isChrome) {
+      window.alert('BLE may not work in your browser. Use Chrome or check for a list of compatible browsers here: https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API')
+    }
   }
 
   p.draw = function () {
-    p.background(0)
-    // p.normalMaterial()
-
-    let spacing = p.windowWidth / sensorValues.length
-
-    for (let i = 0; i < sensorValues.length; i++) {
-      p.push()
-      p.translate((p.windowWidth / 2) - spacing, p.windowHeight / 2)
-      p.translate(spacing * i, 0)
-      p.fill(255)
-      let radius = p.map(sensorValues[i], 0, 65534, 10, spacing / 3)
-      p.ellipse(0, 0, radius, radius)
-      p.text(sensorValues[i], 0, spacing / 3 * 1.20)
-      p.pop()
+    if (isConnected) {
+      p.background(0)
+      // p.normalMaterial()
+      let spacing = p.windowWidth / sensorValues.length
+      for (let i = 0; i < sensorValues.length; i++) {
+        p.push()
+        p.translate((p.windowWidth / 2) - spacing, p.windowHeight / 2)
+        p.translate(spacing * i, 0)
+        p.fill(255)
+        let radius = p.map(sensorValues[i], 0, 65534, 10, spacing / 3)
+        p.ellipse(0, 0, radius, radius)
+        p.text(sensorValues[i], 0, spacing / 3 * 1.20)
+        p.pop()
+      }
+    } else {
+      p.background(255, 0, 0)
+      p.translate(p.windowWidth / 2, p.windowHeight / 2)
+      p.text('No BLE Connection, click anywhere to pair BLE device', 0, 0)
     }
   }
 
@@ -70,6 +79,12 @@ function connectAndStartNotify () {
 function gotCharacteristics (error, characteristics) {
   if (error) console.log('error: ', error)
   console.log(characteristics.length)
+  // Check if myBLE is connected
+  isConnected = myBLE.isConnected()
+
+  // Add a event handler when the device is disconnected
+  myBLE.onDisconnected(onDisconnected)
+
   for (let i = 0; i < characteristics.length; i++) {
     if (i === 0) {
       sensorCharacteristic = characteristics[i]
@@ -86,6 +101,11 @@ function gotCharacteristics (error, characteristics) {
       console.log("characteristic doesn't match.")
     }
   }
+}
+
+function onDisconnected () {
+  console.log('Device got disconnected.')
+  isConnected = false
 }
 
 // A function that will be called once got characteristics
