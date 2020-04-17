@@ -7,6 +7,7 @@ let sensorCharacteristic
 let sensorValues = []
 let myBLE
 let isConnected = false
+// todo: webpack is building with html file paths defaulting to root. This should be local to make it easer to host demos with github pages
 
 const sketch = (p) => {
   let x = 100
