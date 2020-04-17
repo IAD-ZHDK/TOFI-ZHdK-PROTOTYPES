@@ -40,9 +40,7 @@ boolean connected = false;
 double lastMillisLed;
 double lastMillisPoll;
 boolean oscilator = false;
-/**
-* The union directive allows 3 variables to share the same memory location.
-*/
+
 union {
   uint16_t a[4];
   unsigned char bytes[8];
