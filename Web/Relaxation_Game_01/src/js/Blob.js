@@ -5,21 +5,21 @@ class Blob {
     let angle = p.random(0, 2 * p.PI)
     this.xspeed = p.random(2, 5) * Math.cos(angle)
     this.yspeed = p.random(2, 5) * Math.sin(angle)
-    this.r = p.random(300, 400)
+    this.r = p.random(10, 30)
     this.Xangle = p.random(p.PI)
     this.Yangle = p.random(p.PI)
+    this.speed = 0.003
     this.Xamp = p.random(120)
     this.Yamp = p.random(120)
   }
 
   update (p) {
-    this.Xangle += 0.04
-    this.Yangle += 0.04
-    this.x = p.width / 2 + p.sin(this.Xangle) * this.Xamp
-    this.y = p.height / 2 + p.sin(this.Yangle) * this.Yamp
+    this.Xangle += this.speed
+    this.Yangle += this.speed
+    this.x = p.sin(this.Xangle) * this.Xamp
+    this.y = p.sin(this.Yangle) * this.Yamp
   }
-
-  show (p) {
+  draw (p) {
     p.noFill()
     p.stroke(0)
     p.strokeWeight(4)

@@ -9,7 +9,7 @@ class Wave {
     this.springs = new Array(this.springxcount)
     this.nodeWidth = 3
     this.maxSplash = 1000
-    this.Spread = 0.2
+    this.Spread = 0.4
     // controls how fast the waves spread. It can take values between 0 and 0.5, with larger values making the waves spread out faster.
 
     for (let i = 0; i < this.springxcount; i++) {
@@ -65,33 +65,22 @@ class Wave {
     let d = p.pixelDensity()
     for (let i = 0; i < this.springxcount; i++) {
       for (let j = 0; j < this.springycount; j++) {
-        if (this.springs[i][j].CurentHeight >= 5) {
+        if (this.springs[i][j].CurentHeight >= 15) {
           let loc = (i + (j * img.width)) * 4
           img.pixels[loc] = 254
           img.pixels[loc + 1] = 254
           img.pixels[loc + 2] = 254
-          img.pixels[loc + 3] = this.minMax(this.springs[i][j].CurentHeight * 6, 0, 254)
-          // img.set(i, j, p.color(255))
+          img.pixels[loc + 3] = this.minMax(this.springs[i][j].CurentHeight * 5, 0, 254)
         }
       }
     }
     img.updatePixels()
-    img.resize(p.windowWidth, p.windowHeight)
-    p.image(img, 0, 0)
-    /*
-    p.loadPixels()
-    let d = p.pixelDensity()
-    for (let x = 0; x < p.windowWidth * d; x += 1) {
-      for (let y = 0; y < p.windowHeight * d; y += 1) {
-        let loc = (x + (y * p.windowWidth * d)) * 4
-      //  p.pixels[loc] = 20
-      //  p.pixels[loc + 1] = 254
-      //  p.pixels[loc + 2] = 254
-      //  p.pixels[loc + 3] = 254
-      }
-    }
-    p.updatePixels()
-     */
+    img.resize(p.windowWidth / 2, p.windowHeight / 2)
+    let positionX = p.windowWidth / 2
+    positionX -= p.windowWidth / 4
+    let positionY = p.windowHeight / 2
+    positionY -= p.windowHeight / 4
+    p.image(img, positionX, positionY)
   }
 }
 export default Wave

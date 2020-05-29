@@ -36,35 +36,30 @@ const sketch = (p) => {
     p.fill(255)
     p.push()
     if (myBLE.isConnected) {
-      // p.normalMaterial()
-      let spacing = p.windowWidth / myBLE.sensorValues.length
-
-      p.translate((spacing / 2), p.windowHeight / 2)
-      for (let i = 0; i < myBLE.sensorValues.length; i++) {
-        p.push()
-        p.translate(spacing * i, 0)
-        let radius = p.map(myBLE.sensorValues[i], 0, 16384, 10, spacing * 0.8)
-        p.ellipse(0, 0, radius, radius)
-        p.text(myBLE.sensorValues[i], 0, spacing / 3 * 1.20)
-        p.pop()
-      }
+      drawGame(p)
+      let fps = p.frameRate()
+      p.fill(255)
+      p.translate(30, p.height - 10)
+      p.textSize(10)
+      p.text('FPS: ' + fps.toFixed(2), 0, 0)
     } else {
       p.translate(p.windowWidth / 2, p.windowHeight / 2)
       p.text('No BLE Connection, click anywhere to pair BLE device', 0, 0)
     }
-    let fps = p.frameRate()
-    p.fill(255)
-    p.translate(0, 30)
-    p.text('FPS: ' + fps.toFixed(2), 0, 0)
-    p.pop()
-    drawGame(p)
   }
+
   p.touchStarted = function () {
-    // myBLE.connectAndStartNotify()
+    myBLE.connectAndStartNotify()
     wave.Splash(p.floor(p.mouseX), p.floor(p.mouseY), 1000)
   }
 
   function drawGame (p) {
+    let spacing = p.windowWidth / 5
+    for (let i = 0; i < myBLE.sensorValues.length; i++) {
+      if (myBLE.sensorValues[i] >= 1000) {
+        wave.Splash(spacing + p.floor(spacing * i), p.windowHeight / 2, myBLE.sensorValues[i])
+      }
+    }
     wave.update(p)
   }
 

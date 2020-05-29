@@ -7,10 +7,10 @@ class Ble {
     this.myBLE = new P5ble()
     this.isConnected = false
     this.sensorValues = []
-    this.sensorValues[0] = 16384
-    this.sensorValues[1] = 16384
-    this.sensorValues[2] = 16384
-    this.sensorValues[3] = 16384
+    this.sensorValues[0] = 0
+    this.sensorValues[1] = 0
+    this.sensorValues[2] = 0
+    this.sensorValues[3] = 0
     that = this // set a reference to the instance this
   }
   connectAndStartNotify () {

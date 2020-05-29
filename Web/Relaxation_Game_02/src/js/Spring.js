@@ -5,8 +5,8 @@ class Spring {
     this.CurentHeight = 0
     // float k = 1;
     // float m = 100;
-    this.km = 0.01 // spring constant (k) divided by mass (m)
-    this.d = 0.04 // dampening factor
+    this.km = 0.012 // spring constant (k) divided by mass (m)
+    this.d = 0.073 // dampening factor
     this._x = 0
     this._y = 0
     this.x = 0
