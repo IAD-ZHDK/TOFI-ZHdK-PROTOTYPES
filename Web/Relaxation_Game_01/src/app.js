@@ -88,7 +88,6 @@ function gotCharacteristics (error, characteristics) {
     if (i === 0) {
       sensorCharacteristic = characteristics[i]
       // Set datatype to 'custom', p5.ble.js won't parse the data, will return data as it is.
-
       myBLE.startNotifications(sensorCharacteristic, handleSensor, 'custom')
       console.log('characteristics: 1')
     } else if (i === 1) {
@@ -155,34 +154,6 @@ function drawGame (p) {
     // blobs[i].Yamp = p.map(sensorValues[1], 100, 16384, 10, visRadius * 2)
     // blobs[i].r = 100 + (sensorValues[1] + sensorValues[0] / 2) * 0.1
     blobs[i].update(p)
-  }
-}
-function drawGame2 (p) {
-  loadPixels();
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
-      let sum = 0
-      for (i = 0; i < blobs.length; i++) {
-        let xdif = x - blobs[i].x
-        let ydif = y - blobs[i].y
-        let d = sqrt((xdif * xdif) + (ydif * ydif))
-        if (d <= blobs[i].r/2) {
-          sum += 10 * blobs[i].r / d
-        }
-      }
-      if (sum >= 220) {
-        let i = (x + (y * width)) * 4
-        pixels[i] = sum
-        pixels[i + 1] = 254
-        pixels[i + 2] = 254
-        pixels[i + 3] = 254
-      }
-    }
-  }
-
-  updatePixels();
-  for (i = 0; i < blobs.length; i++) {
-    blobs[i].update();
   }
 }
 function startScreen (p) {
