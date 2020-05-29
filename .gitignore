@@ -1,5 +1,4 @@
 .DS_Store
-Web/Demo_Game/node_modules/
 node_modules/
 /dist/
 npm-debug.log*
