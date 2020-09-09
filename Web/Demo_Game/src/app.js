@@ -36,12 +36,15 @@ const sketch = (p) => {
       // p.normalMaterial()
       let spacing = p.windowWidth / myBLE.sensorValues.length
       p.translate((spacing / 2), p.windowHeight / 2)
+      // let noSensors = myBLE.sensorValues.length
+      // let noSensors = myBLE.sensorValues.length;
       for (let i = 0; i < myBLE.sensorValues.length; i++) {
+        // for (let i = myBLE.sensorValues.length; i > myBLE.sensorValues.length - 2; i--) {
         p.push()
         p.translate(spacing * i, 0)
         let radius = p.map(myBLE.sensorValues[i], 0, 16384, 10, spacing * 0.8)
         p.ellipse(0, 0, radius, radius)
-        p.text(myBLE.sensorValues[i], 0, spacing / 3 * 1.20)
+        p.text(myBLE.sensorValues[i], 0, spacing / 3 * 2.70)
         p.pop()
       }
     } else {

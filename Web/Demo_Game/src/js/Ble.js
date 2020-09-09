@@ -3,14 +3,18 @@ import P5ble from 'p5ble'
 let that
 class Ble {
   constructor () {
-    this.serviceUuid = 'ff9c1e42-7b32-11ea-bc55-0242ac130003'
+    this.serviceUuid = 'A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE'
     this.myBLE = new P5ble()
     this.isConnected = false
     this.sensorValues = []
-    this.sensorValues[0] = 16384
-    this.sensorValues[1] = 16384
-    this.sensorValues[2] = 16384
-    this.sensorValues[3] = 16384
+    this.sensorValues[0] = 0
+    this.sensorValues[1] = 0
+    this.sensorValues[2] = 0
+    this.sensorValues[3] = 0
+    this.sensorValues[4] = 0
+    this.sensorValues[5] = 0
+    this.sensorValues[6] = 0
+    this.sensorValues[7] = 0
     that = this // set a reference to the instance this
   }
 
@@ -56,15 +60,24 @@ class Ble {
 
   handleSensor (data) {
     let factor = 0.8
+    // console.log(data.toString())
     // weighted moving average of values
-    that.sensorValues[1] = Math.floor(that.sensorValues[1] * factor)
     that.sensorValues[0] = Math.floor(that.sensorValues[0] * factor)
+    that.sensorValues[1] = Math.floor(that.sensorValues[1] * factor)
     that.sensorValues[2] = Math.floor(that.sensorValues[2] * factor)
     that.sensorValues[3] = Math.floor(that.sensorValues[3] * factor)
+    that.sensorValues[4] = Math.floor(that.sensorValues[4] * factor)
+    that.sensorValues[5] = Math.floor(that.sensorValues[5] * factor)
+    that.sensorValues[6] = Math.floor(that.sensorValues[6] * factor)
+    that.sensorValues[7] = Math.floor(that.sensorValues[7] * factor)
     that.sensorValues[0] += Math.floor(data.getUint16(0, true) * (1.0 - factor))
     that.sensorValues[1] += Math.floor(data.getUint16(2, true) * (1.0 - factor))
     that.sensorValues[2] += Math.floor(data.getUint16(4, true) * (1.0 - factor))
     that.sensorValues[3] += Math.floor(data.getUint16(6, true) * (1.0 - factor))
+    that.sensorValues[4] += Math.floor(data.getUint16(8, true) * (1.0 - factor))
+    that.sensorValues[5] += Math.floor(data.getUint16(10, true) * (1.0 - factor))
+    that.sensorValues[6] += Math.floor(data.getUint16(11, true) * (1.0 - factor))
+    that.sensorValues[7] += Math.floor(data.getUint16(12, true) * (1.0 - factor))
   }
 }
 export default Ble
