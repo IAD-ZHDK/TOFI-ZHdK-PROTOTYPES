@@ -3,7 +3,7 @@ import P5ble from 'p5ble'
 let that
 class Ble {
   constructor () {
-    this.serviceUuid = 'ff9c1e42-7b32-11ea-bc55-0242ac130003'
+    this.serviceUuid = 'A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE'
     this.myBLE = new P5ble()
     this.isConnected = false
     this.sensorValues = []

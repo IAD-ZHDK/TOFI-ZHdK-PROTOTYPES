@@ -3,6 +3,7 @@ import P5ble from 'p5ble'
 let that
 class Ble {
   constructor () {
+    console.log('looking for: A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE')
     this.serviceUuid = 'A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE'
     this.myBLE = new P5ble()
     this.isConnected = false
