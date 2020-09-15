@@ -1,4 +1,4 @@
-## A Demo Game for the TOFI Myofunctional Trainer
+## A BLE demo for the TOFI Myofunctional Trainer
 The demo requires browser that supports Bluetooth Low Power (BLE) web API, such a google chrome.
 
 ## How to install

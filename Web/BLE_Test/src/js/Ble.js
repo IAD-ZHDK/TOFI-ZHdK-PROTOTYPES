@@ -40,7 +40,6 @@ class Ble {
         if (i === 0) {
           const sensorCharacteristic = characteristics[i]
           // Set datatype to 'custom', p5.ble.js won't parse the data, will return data as it is.
-
           that.myBLE.startNotifications(sensorCharacteristic, that.handleSensor, 'custom')
           console.log('characteristics: 1')
         } else if (i === 1) {
