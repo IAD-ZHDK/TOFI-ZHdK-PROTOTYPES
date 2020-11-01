@@ -1,8 +1,13 @@
 import P5 from 'p5'
 import P5ble from 'p5ble'
 let that
+
 class Ble {
   constructor () {
+    let isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime)
+    if (!isChrome) {
+      window.alert('BLE may not work in your browser. Use Chrome or check for a list of compatible browsers here: https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API')
+    }
     console.log('looking for: A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE')
     this.serviceUuid = 'A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE'
     this.myBLE = new P5ble()
@@ -16,7 +21,10 @@ class Ble {
     this.sensorValues[5] = 0
     this.sensorValues[6] = 0
     this.sensorValues[7] = 0
-    that = this // set a reference to the instance this
+    this.chanelNames = ['Battery', 'Reference', 'Ch 6', 'Ch 5', 'Ch 4', 'Ch 3', 'Ch 2', 'Ch 1']
+    this.filtering = true
+    this.factor = 0.5
+    that = this
   }
 
   connectAndStartNotify () {
@@ -58,26 +66,44 @@ class Ble {
     this.isConnected = false
   }
 
+  setFilter (filter) {
+    this.factor = filter
+    if (this.factor <= 0.01) {
+      this.filtering = false
+    } else {
+      this.filtering = true
+    }
+  }
+
   handleSensor (data) {
-    let factor = 0.8
-    // console.log(data.toString())
-    // weighted moving average of values
-    that.sensorValues[0] = Math.floor(that.sensorValues[0] * factor)
-    that.sensorValues[1] = Math.floor(that.sensorValues[1] * factor)
-    that.sensorValues[2] = Math.floor(that.sensorValues[2] * factor)
-    that.sensorValues[3] = Math.floor(that.sensorValues[3] * factor)
-    that.sensorValues[4] = Math.floor(that.sensorValues[4] * factor)
-    that.sensorValues[5] = Math.floor(that.sensorValues[5] * factor)
-    that.sensorValues[6] = Math.floor(that.sensorValues[6] * factor)
-    that.sensorValues[7] = Math.floor(that.sensorValues[7] * factor)
-    that.sensorValues[0] += Math.floor(data.getUint16(0, true) * (1.0 - factor))
-    that.sensorValues[1] += Math.floor(data.getUint16(2, true) * (1.0 - factor))
-    that.sensorValues[2] += Math.floor(data.getUint16(4, true) * (1.0 - factor))
-    that.sensorValues[3] += Math.floor(data.getUint16(6, true) * (1.0 - factor))
-    that.sensorValues[4] += Math.floor(data.getUint16(8, true) * (1.0 - factor))
-    that.sensorValues[5] += Math.floor(data.getUint16(10, true) * (1.0 - factor))
-    that.sensorValues[6] += Math.floor(data.getUint16(11, true) * (1.0 - factor))
-    that.sensorValues[7] += Math.floor(data.getUint16(12, true) * (1.0 - factor))
+    if (that.filtering) {
+      let factor = that.factor
+      that.sensorValues[0] = Math.floor(that.sensorValues[0] * factor)
+      that.sensorValues[1] = Math.floor(that.sensorValues[1] * factor)
+      that.sensorValues[2] = Math.floor(that.sensorValues[2] * factor)
+      that.sensorValues[3] = Math.floor(that.sensorValues[3] * factor)
+      that.sensorValues[4] = Math.floor(that.sensorValues[4] * factor)
+      that.sensorValues[5] = Math.floor(that.sensorValues[5] * factor)
+      that.sensorValues[6] = Math.floor(that.sensorValues[6] * factor)
+      that.sensorValues[7] = Math.floor(that.sensorValues[7] * factor)
+      that.sensorValues[0] += Math.floor(data.getUint16(0, true) * (1.0 - factor))
+      that.sensorValues[1] += Math.floor(data.getUint16(2, true) * (1.0 - factor))
+      that.sensorValues[2] += Math.floor(data.getUint16(4, true) * (1.0 - factor))
+      that.sensorValues[3] += Math.floor(data.getUint16(6, true) * (1.0 - factor))
+      that.sensorValues[4] += Math.floor(data.getUint16(8, true) * (1.0 - factor))
+      that.sensorValues[5] += Math.floor(data.getUint16(10, true) * (1.0 - factor))
+      that.sensorValues[6] += Math.floor(data.getUint16(12, true) * (1.0 - factor))
+      that.sensorValues[7] += Math.floor(data.getUint16(14, true) * (1.0 - factor))
+    } else {
+      that.sensorValues[0] = data.getUint16(0, true)
+      that.sensorValues[1] = data.getUint16(2, true)
+      that.sensorValues[2] = data.getUint16(4, true)
+      that.sensorValues[3] = data.getUint16(6, true)
+      that.sensorValues[4] = data.getUint16(8, true)
+      that.sensorValues[5] = data.getUint16(10, true)
+      that.sensorValues[6] = data.getUint16(12, true)
+      that.sensorValues[7] = data.getUint16(14, true)
+    }
   }
 }
 export default Ble

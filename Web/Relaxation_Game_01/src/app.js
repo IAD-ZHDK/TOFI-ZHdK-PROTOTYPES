@@ -29,10 +29,6 @@ const sketch = (p) => {
     p.textSize(p.width / 60)
     myMeta = new Meta(p, 350, 350)
     p.textAlign(p.CENTER, p.CENTER)
-    let isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime)
-    if (!isChrome) {
-      window.alert('BLE may not work in your browser. Use Chrome or check for a list of compatible browsers here: https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API')
-    }
   }
 
   p.draw = function () {
