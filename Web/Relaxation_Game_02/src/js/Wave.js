@@ -25,8 +25,8 @@ class Wave {
     }
   }
   Splash (x, y, Velocity) {
-    x = Math.floor(x / this.scaleFactor)
-    y = Math.floor(y / this.scaleFactor)
+    x = Math.floor(10)
+    y = Math.floor(10)
     this.springs[x][y].Velocity = Velocity
   }
 

@@ -55,9 +55,9 @@ const sketch = (p) => {
 
   function drawGame (p) {
     let spacing = p.windowWidth / 5
-    for (let i = 0; i < myBLE.sensorValues.length; i++) {
-      if (myBLE.sensorValues[i] >= 1000) {
-        wave.Splash(spacing + p.floor(spacing * i), p.windowHeight / 2, myBLE.sensorValues[i])
+    for (let i = 2; i < myBLE.sensorValues.length - 1; i++) {
+      if (myBLE.sensorValues[i] >= 20000) {
+        wave.Splash(spacing + p.floor(spacing * i), p.windowHeight / 2, myBLE.sensorValues[i] / 100)
       }
     }
     wave.update(p)
