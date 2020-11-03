@@ -13,4 +13,8 @@
 
  Relaxation_Game_02
  https://iad-zhdk.github.io/TOFI-ZHdK-PROTOTYPES/Web/Relaxation_Game_02/dist/index.html
+ 
+ Acoustic_Feedback_01
+ https://iad-zhdk.github.io/TOFI-ZHdK-PROTOTYPES/Web/Acoustic_Feedback_01/dist/index.html
+
 
