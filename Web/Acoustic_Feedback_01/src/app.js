@@ -55,7 +55,7 @@ const sketch = (p) => {
     p.fill(255)
     p.noStroke()
     p.textAlign(p.CENTER, p.CENTER)
-    // setup settings gui
+    // setup settings gui§
     let filter = p.gui.addFolder('filter (weighted moving average)')
     filter.add(p.guiObject, 'factor', 0.0, 0.99) //  (weighted moving average)
     filter.add(p.guiObject, 'threshold', 0, 50000) //
@@ -161,7 +161,7 @@ const sketch = (p) => {
           Notes[i].release()
         }
       }
-
+      p.stroke(255)
       p.text(sensorValues[i], Notes[i].x, p.height - 50)
       p.text(usedChannelNames[i], Notes[i].x, p.height - 30)
     }

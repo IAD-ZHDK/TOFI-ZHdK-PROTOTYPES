@@ -4,26 +4,35 @@ let that
 
 class Ble {
   constructor () {
+    /*
     let isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime)
     if (!isChrome) {
       window.alert('BLE may not work in your browser. Use Chrome or check for a list of compatible browsers here: https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API')
     }
-    console.log('looking for: A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE')
-    this.serviceUuid = 'A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE'
+    */
+    this.id = 'default'
+    this.serviceUuid = 'A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE' // The UUID for the main service on the TOFI trainer
+    console.log('looking for:' + this.serviceUuid)
     this.myBLE = new P5ble()
+    this.noChannels = 8
     this.isConnected = false
     this.sensorValues = []
-    this.sensorValues[0] = 0
-    this.sensorValues[1] = 0
-    this.sensorValues[2] = 0
-    this.sensorValues[3] = 0
-    this.sensorValues[4] = 0
-    this.sensorValues[5] = 0
-    this.sensorValues[6] = 0
-    this.sensorValues[7] = 0
+    for (let i = 0; i < this.noChannels; i++) {
+      this.sensorValues[i] = 0
+    }
     this.chanelNames = ['Battery', 'Reference', 'Ch 6', 'Ch 5', 'Ch 4', 'Ch 3', 'Ch 2', 'Ch 1']
-    this.filtering = true
-    this.factor = 0.5
+    this.chanelOptions = {
+    }
+    for (let i = 0; i < this.noChannels; ++i) {
+      this.chanelOptions[this.chanelNames[i]] = {
+        // 'name': this.chanelNames[i],
+        'active': true,
+        'filter': 0.8,
+        'min': 1000,
+        'max': 16384,
+        'threshold': 10000
+      }
+    }
     that = this
   }
 
@@ -36,11 +45,13 @@ class Ble {
     if (error) {
       console.log('error: ', error)
     } else {
+      // console.log('address: ' + that.myBLE.address)
       console.log(characteristics[0])
       // Check if myBLE is connected
       console.log('check connection.')
       that.isConnected = that.myBLE.isConnected()
-
+      // console.log()
+      that.id = that.myBLE.device.id
       // Add a event handler when the device is disconnected
       that.myBLE.onDisconnected(that.onDisconnected)
 
@@ -66,43 +77,24 @@ class Ble {
     this.isConnected = false
   }
 
-  setFilter (filter) {
-    this.factor = filter
-    if (this.factor <= 0.01) {
-      this.filtering = false
+  setFilter (chanel, value) {
+    this.chanelOptions[ chanel ].filter = value
+    if (value <= 0.01) {
+      this.chanelOptions[ chanel ].filterering = false
     } else {
-      this.filtering = true
+      this.chanelOptions[ chanel ].filterering = true
     }
   }
 
   handleSensor (data) {
-    if (that.filtering) {
-      let factor = that.factor
-      that.sensorValues[0] = Math.floor(that.sensorValues[0] * factor)
-      that.sensorValues[1] = Math.floor(that.sensorValues[1] * factor)
-      that.sensorValues[2] = Math.floor(that.sensorValues[2] * factor)
-      that.sensorValues[3] = Math.floor(that.sensorValues[3] * factor)
-      that.sensorValues[4] = Math.floor(that.sensorValues[4] * factor)
-      that.sensorValues[5] = Math.floor(that.sensorValues[5] * factor)
-      that.sensorValues[6] = Math.floor(that.sensorValues[6] * factor)
-      that.sensorValues[7] = Math.floor(that.sensorValues[7] * factor)
-      that.sensorValues[0] += Math.floor(data.getUint16(0, true) * (1.0 - factor))
-      that.sensorValues[1] += Math.floor(data.getUint16(2, true) * (1.0 - factor))
-      that.sensorValues[2] += Math.floor(data.getUint16(4, true) * (1.0 - factor))
-      that.sensorValues[3] += Math.floor(data.getUint16(6, true) * (1.0 - factor))
-      that.sensorValues[4] += Math.floor(data.getUint16(8, true) * (1.0 - factor))
-      that.sensorValues[5] += Math.floor(data.getUint16(10, true) * (1.0 - factor))
-      that.sensorValues[6] += Math.floor(data.getUint16(12, true) * (1.0 - factor))
-      that.sensorValues[7] += Math.floor(data.getUint16(14, true) * (1.0 - factor))
-    } else {
-      that.sensorValues[0] = data.getUint16(0, true)
-      that.sensorValues[1] = data.getUint16(2, true)
-      that.sensorValues[2] = data.getUint16(4, true)
-      that.sensorValues[3] = data.getUint16(6, true)
-      that.sensorValues[4] = data.getUint16(8, true)
-      that.sensorValues[5] = data.getUint16(10, true)
-      that.sensorValues[6] = data.getUint16(12, true)
-      that.sensorValues[7] = data.getUint16(14, true)
+    for (let i = 0; i < that.noChannels; i++) {
+      let byteCount = i * 2
+      if (that.chanelOptions[ i ].filterering === true) {
+        that.sensorValues[i] = Math.floor(that.sensorValues[i] * that.chanelOptions[i].filter)
+        that.sensorValues[i] += Math.floor(data.getUint16(byteCount, true) * (1.0 - that.chanelOptions[i].filter))
+      } else {
+        that.sensorValues[i] = data.getUint16(byteCount, true)
+      }
     }
   }
 }

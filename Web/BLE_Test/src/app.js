@@ -1,6 +1,7 @@
 import './css/style.css'
 import P5 from 'p5'
 import Ble from './js/Ble'
+import Parameters from './js/Parameters'
 // import * as dat from 'dat.gui'
 // todo: webpack is building with html file paths defaulting to root. This should be local to make it easer to host demos with github pages
 const containerElement = document.getElementById('p5-container')
@@ -10,6 +11,7 @@ const sketch = (p) => {
   let y = 100
   let myFont
   let myBLE
+  let calibration
   let histogram = new Array(8)
   // Loop to create 2D array
   for (let i = 0; i < histogram.length; i++) {
@@ -17,15 +19,7 @@ const sketch = (p) => {
   }
 
   const serviceUuid = 'ff9c1e42-7b32-11ea-bc55-0242ac130003'
-  let sensorCharacteristic
   let isConnected = false
-
-  // settings gui
-  const dat = require('dat.gui')
-  p.gui = new dat.GUI()
-  p.guiObject = {
-    factor: 0.5
-  }
 
   p.preload = function () {
     myFont = p.loadFont('static/fonts/inconsolata.otf')
@@ -40,9 +34,7 @@ const sketch = (p) => {
     p.noStroke()
     p.textAlign(p.CENTER, p.CENTER)
     // setup settings gui
-    let filter = p.gui.addFolder('filter (weighted moving average)')
-    filter.add(p.guiObject, 'factor', 0.0, 0.99) //  (weighted moving average)
-    filter.open()
+    calibration = new Parameters(myBLE.id, myBLE.chanelOptions)
     // histogram
   }
 
@@ -81,7 +73,7 @@ const sketch = (p) => {
         p.translate(0, p.textSize())
         p.text(myBLE.chanelNames[i], 0, 0)
         p.pop()
-        myBLE.setFilter(p.guiObject.factor)
+        // myBLE.setFilter(i, calibration.getFactor(i))
       }
     } else {
       p.translate(p.windowWidth / 2, p.windowHeight / 2)
