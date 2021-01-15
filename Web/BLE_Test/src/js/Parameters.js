@@ -1,39 +1,57 @@
 class Parameters {
-  constructor (id, chanelOptions) {
-    const dat = require('dat.gui')
-    this.gui = new dat.GUI()
-    // this.guiObject = {}
-    this.buildGUI(chanelOptions)
-    /* for (let i in chanelOptions) {
-      this.guiObject[ 'factor_' + i ] = chanelOptions[i].filter
-      this.guiObject[ 'threshold_' + i ] = chanelOptions[i].threshold
+  constructor (id) {
+    this.cookieID = id
+    // construct calibration object
+    this.noChannels = 8
+    this.chanelNames = ['Battery', 'Reference', 'Ch 6', 'Ch 5', 'Ch 4', 'Ch 3', 'Ch 2', 'Ch 1']
+    this.chanelOptions = {
     }
-    console.log(this.guiObject)
-    this.folders = { }
-    for (let i in chanelOptions) {
-      this.folders[i] = this.gui.addFolder(chanelOptions[i].name)
-      this.folders[i].add(this.guiObject, 'factor_' + i, 0.0, 0.99) //  (weighted moving average)
-      this.folders[i].add(this.guiObject, 'threshold_' + i, 0, 16384) //  (weighted moving average)
-      // this.folders[i].open()
-    } */
-    let cookieData = this.getCookie('name')
+    for (let i = 0; i < this.noChannels; ++i) {
+      this.chanelOptions[this.chanelNames[i]] = {
+        'active': true,
+        'filter': 0.8,
+        'min': 1000,
+        'max': 16384,
+        'threshold': 10000
+      }
+    }
+    let cookieData = this.getCookie(this.cookieID)
     if (cookieData !== '') {
+      console.log('last cookie:')
       console.log(cookieData)
+      let obj = JSON.parse(cookieData)
+      console.log('old cookie')
+      console.log(obj)
+      Object.assign(this.chanelOptions, obj)
+      // this.chanelOptions = obj
     } else {
       console.log('no cookie')
     }
-    // this.setCookie('name', 'test', 365)
+    this.buildGUI(this.chanelOptions)
   }
-  getFactor (chanel) {
-    return this.guiObject[ 'factor_' + chanel ]
+
+  getFilters () {
+    let filters = []
+    for (let i = 0; i < this.noChannels; i++) {
+      filters[i] = this.chanelOptions[Object.keys(this.chanelOptions)[i]].filter
+    }
+    return filters
+  }
+
+  objectToJsonCookie () {
+    // creat Json object and set cookie
+    console.log('object to json cookie set')
+    let myJSON = JSON.stringify(this.chanelOptions)
+    // console.log(myJSON)
+    this.setCookie(this.cookieID, myJSON, 2000)
   }
   // https://www.w3schools.com/js/js_cookies.asp
-
   setCookie (cname, cvalue, exdays) {
     let d = new Date()
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000))
     let expires = 'expires=' + d.toUTCString()
     document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/'
+    console.log(this.getCookie(cname))
   }
 
   getCookie (cname) {
@@ -52,19 +70,19 @@ class Parameters {
   }
   // automaticly building guid from javascript taken from:  https://gist.github.com/heaversm/b159b51f4e68603b05dc417dfadb43c5
   buildGUI (config) {
+    const dat = require('dat.gui')
+    this.gui = new dat.GUI()
     this.guiFolder = this.gui.addFolder('Calibration')
     this.addToGui(config, this.guiFolder)
     // add a button to be able to update your scene with changed variables if they don't auto-update things on screen
   }
 
   addToGui (obj, folder) {
+    let bindCallback = this.objectToJsonCookie.bind(this)
     for (const key in obj) { // for each key in your object
       if (obj.hasOwnProperty(key)) {
-        console.log('key name:' + key)
-        console.log(typeof obj[key])
         let val = obj[key]
         if (typeof val === 'object') {
-          console.log('new folder:' + key)
           let newFolder = folder.addFolder(key)
           this.addToGui(val, newFolder) // if the key is an object itself, call this function again to loop through that subobject, assigning it to the same folder
         } else if (typeof val === 'number') { // if the value of the object key is a number, establish limits and step
@@ -73,24 +91,23 @@ class Parameters {
             step = 0.01
             limit = 0.99
           } else { // otherwise, calculate the limits and step based on # of digits in the number
-            limit = 16384 // 14 bits
+            limit = 32768 // 15 bits
             step = 10 // ...with a step one less than the number of digits, i.e. '10'
           }
-          folder.add(obj, key, 0, limit).step(step) // add the value to your GUI folder
+          folder.add(obj, key, 0, limit).step(step).onChange(function () {
+            bindCallback()
+          })// add the value to your GUI folder
         } else if (typeof val === 'boolean') {
-          folder.add(obj, key).onChange(
-            function () {
-              console.log('gui_Changed')
-            }) // add a radio button to GUI folder
+          folder.add(obj, key).onChange(function () {
+            bindCallback()
+          }) // add a radio button to GUI folder
         } else {
-          folder.add(obj, key) // ...this would include things like boolean values as checkboxes, and strings as text fields
+          folder.add(obj, key).onChange(function () {
+            bindCallback()
+          }) // ...this would include things like boolean values as checkboxes, and strings as text fields
         }
       }
     }
-  // .onChange(
-  //    function () {
-  //      console.log('gui_Changed')
-  //    })
   }
 }
 export default Parameters

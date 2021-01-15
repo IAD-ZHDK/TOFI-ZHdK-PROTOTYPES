@@ -34,7 +34,8 @@ const sketch = (p) => {
     p.noStroke()
     p.textAlign(p.CENTER, p.CENTER)
     // setup settings gui
-    calibration = new Parameters(myBLE.id, myBLE.chanelOptions)
+    // todo: id should be sent from ble only after connection established
+    calibration = new Parameters(6) // myBLE.id
     // histogram
   }
 
@@ -48,33 +49,58 @@ const sketch = (p) => {
       let spacing = p.windowWidth / myBLE.sensorValues.length
       p.translate((spacing / 2), p.windowHeight / 2)
       for (let i = 0; i < myBLE.sensorValues.length; i++) {
-        p.push()
-        p.translate(spacing * i, 0)
-        let radius = p.map(myBLE.sensorValues[i], 0, 16384, 10, spacing * 0.3)
-        histogram[i].unshift(radius / 2)
-        p.stroke(100)
-        p.noFill()
+        let active = calibration.chanelOptions[Object.keys(calibration.chanelOptions)[i]].active
+        let threshold = calibration.chanelOptions[Object.keys(calibration.chanelOptions)[i]].threshold
+        let min = calibration.chanelOptions[Object.keys(calibration.chanelOptions)[i]].min
+        let max = calibration.chanelOptions[Object.keys(calibration.chanelOptions)[i]].max
+        if (active) {
+          p.push()
+          // histogram
+          p.translate(spacing * i, 0)
+          let radius = p.map(myBLE.sensorValues[i], min, max, 0, spacing * 0.5)
+          histogram[i].unshift(radius / 2)
+          p.stroke(100)
+          p.noFill()
 
-        p.beginShape()
-        for (let j = 0; j < histogram[i].length - 1; j++) {
-          p.vertex(histogram[i][j], -j)
+          p.beginShape()
+          for (let j = 0; j < histogram[i].length - 1; j++) {
+            p.vertex(histogram[i][j], -j)
+          }
+          p.endShape()
+          p.beginShape()
+          for (let j = 0; j < histogram[i].length - 1; j++) {
+            p.vertex(-histogram[i][j], -j)
+          }
+          p.endShape()
+
+          if (myBLE.sensorValues[i] > threshold) {
+            p.fill(255, 0, 0)
+          } else {
+            p.fill(255)
+          }
+          p.ellipse(0, 0, radius, radius)
+          p.noStroke()
+          p.translate(0, spacing / 3 * 4.0)
+          p.text(myBLE.sensorValues[i], 0, 0)
+          p.translate(0, p.textSize())
+          p.text(calibration.chanelNames[i], 0, 0)
+          p.pop()
+        } else {
+          p.push()
+          // histogram
+          p.translate(spacing * i, 0)
+          let radius = spacing * 0.5
+          p.fill(100)
+          p.noStroke()
+          p.ellipse(0, 0, radius, radius)
+          p.translate(0, spacing / 3 * 4.0)
+          p.text(myBLE.sensorValues[i], 0, 0)
+          p.translate(0, p.textSize())
+          p.text(calibration.chanelNames[i], 0, 0)
+          p.pop()
         }
-        p.endShape()
-        p.beginShape()
-        for (let j = 0; j < histogram[i].length - 1; j++) {
-          p.vertex(-histogram[i][j], -j)
-        }
-        p.endShape()
-        p.fill(255)
-        p.ellipse(0, 0, radius, radius)
-        p.noStroke()
-        p.translate(0, spacing / 3 * 4.0)
-        p.text(myBLE.sensorValues[i], 0, 0)
-        p.translate(0, p.textSize())
-        p.text(myBLE.chanelNames[i], 0, 0)
-        p.pop()
-        // myBLE.setFilter(i, calibration.getFactor(i))
       }
+      myBLE.updateFilters(calibration.getFilters())
     } else {
       p.translate(p.windowWidth / 2, p.windowHeight / 2)
       p.text('No BLE Connection, click anywhere to pair BLE device', 0, 0)
