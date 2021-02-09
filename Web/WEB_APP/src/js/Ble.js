@@ -12,7 +12,7 @@ class Ble {
     */
     this.id = 'default'
     this.serviceUuid = 'A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE' // The UUID for the main service on the TOFI trainer
-    this.SensorServiceUuid = 'A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE'
+    // this.SensorServiceUuid = 'A22A0001-AD0B-4DF2-A4E2-1745CBB4dCEE'
     console.log('looking for:' + this.serviceUuid)
     this.myBLE = new P5ble()
     this.noChannels = 8
